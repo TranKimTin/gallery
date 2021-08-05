@@ -56,22 +56,21 @@ public class BottomFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onClick(View v) {
         FragmentManager fragmentManager;
-        Log.d(TAG, "CLICK");
         switch (v.getId()) {
             case R.id.btnAll:
                 fragmentManager = getActivity().getSupportFragmentManager();
                 fragmentManager.beginTransaction()
-                        .replace(R.id.fragmentMain, AllFragment.class, null)
+                        .replace(R.id.fragmentMain, AllFragment.getInstance(), null)
                         .setReorderingAllowed(true)
-                        .addToBackStack("name") // name can be null
+//                        .addToBackStack("all") // name can be null
                         .commit();
                 break;
             case R.id.btnAlbum:
                 fragmentManager = getActivity().getSupportFragmentManager();
                 fragmentManager.beginTransaction()
-                        .replace(R.id.fragmentMain, AlbumFragment.class, null)
+                        .replace(R.id.fragmentMain, AlbumFragment.getInstance(), null)
                         .setReorderingAllowed(true)
-                        .addToBackStack("name") // name can be null
+//                        .addToBackStack("album") // name can be null
                         .commit();
                 break;
         }

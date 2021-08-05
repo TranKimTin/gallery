@@ -13,15 +13,17 @@
             android:layout_height="match_parent"
             android:layout_weight="5"
             android:text="Hình ảnh"
-            android:layout_marginRight="5dp"
+            android:layout_marginRight="1dp"
+            android:textColor="@color/black"
             android:id="@+id/btnAll"/>
         <Button
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="5"
             android:text="Album"
-            android:layout_marginLeft="5dp"
-            android:id="@+id/btnAlbum"/>
+            android:layout_marginLeft="1dp"
+            android:id="@+id/btnAlbum"
+            android:textColor="@color/black"/>
 
     </LinearLayout>
 </FrameLayout>

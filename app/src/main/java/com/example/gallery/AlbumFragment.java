@@ -2,6 +2,8 @@ package com.example.gallery;
 
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import android.view.LayoutInflater;
@@ -13,10 +15,6 @@ public class AlbumFragment extends Fragment {
     public AlbumFragment() {
     }
 
-    public static AlbumFragment newInstance() {
-        instance = new AlbumFragment();
-        return instance;
-    }
     public static AlbumFragment getInstance() {
         if(instance == null) instance = new AlbumFragment();
         return instance;
@@ -30,5 +28,11 @@ public class AlbumFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_album, container, false);
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
     }
 }
