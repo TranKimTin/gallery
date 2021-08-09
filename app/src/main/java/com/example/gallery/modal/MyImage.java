@@ -1,7 +1,11 @@
 package com.example.gallery.modal;
 
+import android.content.Context;
+import android.graphics.Bitmap;
 import android.net.Uri;
+import android.provider.MediaStore;
 
+import java.io.IOException;
 import java.util.Date;
 
 public class MyImage {
@@ -10,13 +14,43 @@ public class MyImage {
     private long size;
     private long date;
     private String url;
+    private String albumName;
+    private long almumId;
 
-    public MyImage(Uri uri, String name, long size, long date, String url) {
+    public MyImage(Uri uri, String name, long size, long date, String url, String albumName, long almumId) {
         this.uri = uri;
         this.name = name;
         this.size = size;
         this.date = date;
         this.url = url;
+        this.albumName = albumName;
+        this.almumId = almumId;
+    }
+
+    Bitmap toBitmap(Context context){
+        try {
+            return MediaStore.Images.Media.getBitmap(context.getContentResolver() , uri);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+
+    public String getAlbumName() {
+        return albumName;
+    }
+
+    public void setAlbumName(String albumName) {
+        this.albumName = albumName;
+    }
+
+    public long getAlmumId() {
+        return almumId;
+    }
+
+    public void setAlmumId(long almumId) {
+        this.almumId = almumId;
     }
 
     public String getUrl() {

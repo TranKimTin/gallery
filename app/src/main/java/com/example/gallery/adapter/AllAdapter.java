@@ -47,7 +47,6 @@ public class AllAdapter extends RecyclerView.Adapter<AllAdapter.AllViewHolder>{
     public void onBindViewHolder(@NonNull AllViewHolder holder, int position) {
         AllImage mList = list.get(position);
         holder.tvDate.setText(new SimpleDateFormat("dd-MM-yyyy").format(mList.getDate()));
-        holder.rcvSubAll.setLayoutManager(new GridLayoutManager(context, 4));
 //        holder.rcvSubAll.setLayoutManager(new LinearLayoutManager(context));
         SubAllAdapter adapter = new SubAllAdapter(context, mList.getList());
         holder.rcvSubAll.setAdapter(adapter);
@@ -64,9 +63,10 @@ public class AllAdapter extends RecyclerView.Adapter<AllAdapter.AllViewHolder>{
 
         public AllViewHolder(@NonNull View itemView) {
             super(itemView);
-            rcvSubAll = itemView.findViewById(R.id.rcvSubAll);
             tvDate = itemView.findViewById(R.id.tvDate);
-
+            rcvSubAll = itemView.findViewById(R.id.rcvSubAll);
+            rcvSubAll.setNestedScrollingEnabled(false);
+            rcvSubAll.setLayoutManager(new GridLayoutManager(context, 4));
             rcvSubAll.setHasFixedSize(true);
         }
     }

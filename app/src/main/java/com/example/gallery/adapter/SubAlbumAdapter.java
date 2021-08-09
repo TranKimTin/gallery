@@ -10,7 +10,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
-import com.example.gallery.MainActivity;
 import com.example.gallery.R;
 import com.example.gallery.modal.MyImage;
 
@@ -23,14 +22,15 @@ import java.util.concurrent.TimeUnit;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import static com.example.gallery.MainActivity.*;
+import static com.example.gallery.MainActivity.TAG;
+import static com.example.gallery.MainActivity.open_file;
 
-public class SubAllAdapter extends RecyclerView.Adapter<SubAllAdapter.SubAllViewHolder> {
+public class SubAlbumAdapter extends RecyclerView.Adapter<SubAlbumAdapter.SubAlbumViewHolder> {
     private List<MyImage> list;
     private Context context;
     private ThreadPoolExecutor executor;
 
-    public SubAllAdapter(Context context, List<MyImage> list) {
+    public SubAlbumAdapter(Context context, List<MyImage> list) {
         this.list = list;
         this.context = context;
 
@@ -51,27 +51,29 @@ public class SubAllAdapter extends RecyclerView.Adapter<SubAllAdapter.SubAllView
 
     @NonNull
     @Override
-    public SubAllViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public SubAlbumViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(context);
-        View view = inflater.inflate(R.layout.item_sub_all, parent, false);
-        SubAllViewHolder viewHolder = new SubAllViewHolder(view);
+        View view = inflater.inflate(R.layout.item_sub_album, parent, false);
+        SubAlbumViewHolder viewHolder = new SubAlbumViewHolder(view);
         return viewHolder;
     }
 
     @Override
-    public void onBindViewHolder(@NonNull SubAllViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull SubAlbumViewHolder holder, int position) {
         MyImage image = list.get(position);
         holder.imv.setImageResource(R.drawable.image_gallery);
-        if(image.getUrl() != null && image.getUrl().matches(".*mp4")) holder.imvPlay.setVisibility(View.VISIBLE);
+        if (image.getUrl() != null && image.getUrl().matches(".*mp4"))
+            holder.imvPlay.setVisibility(View.VISIBLE);
         else holder.imvPlay.setVisibility(View.GONE);
+        Log.d(TAG, image.getUrl() + " " + image.getUrl().matches(".*mp4"));
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
             executor.execute(new Runnable() {
                 @Override
                 public void run() {
                     try {
-                        int size = list.size() < 50 ? 200 : 150;
+                        int size = 200;
                         Bitmap thumbnail = context.getContentResolver().loadThumbnail(image.getUri(), new Size(size, size), null);
-                        ((Activity)context).runOnUiThread(new Runnable() {
+                        ((Activity) context).runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
                                 holder.imv.setImageBitmap(thumbnail);
@@ -96,14 +98,14 @@ public class SubAllAdapter extends RecyclerView.Adapter<SubAllAdapter.SubAllView
         return list.size();
     }
 
-    public class SubAllViewHolder extends RecyclerView.ViewHolder {
+    public class SubAlbumViewHolder extends RecyclerView.ViewHolder {
         ImageView imv;
         ImageView imvPlay;
 
-        public SubAllViewHolder(@NonNull View itemView) {
+        public SubAlbumViewHolder(@NonNull View itemView) {
             super(itemView);
-            imv = itemView.findViewById(R.id.imvAll);
-            imvPlay = itemView.findViewById(R.id.imvPlay);
+            imv = itemView.findViewById(R.id.imvSubAlbum);
+            imvPlay = itemView.findViewById(R.id.imvPlayALbum);
         }
     }
 }

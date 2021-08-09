@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="1dp">
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="120dp"
+        android:src="@drawable/image_gallery"
+        android:scaleType="centerCrop"
+        android:id="@+id/imvAlbum" />
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/tvNameAlbum"
+        android:layout_below="@+id/imvAlbum"
+        android:text="Ảnh"/>
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/tvNumber"
+        android:layout_below="@+id/tvNameAlbum"
+        android:text="30"/>
+</RelativeLayout>

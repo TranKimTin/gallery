@@ -11,17 +11,15 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:src="@drawable/image_gallery"
-            android:id="@+id/imvAll"
+            android:id="@+id/imvSubAlbum"
             android:scaleType="centerCrop"/>
         <ImageView
             android:layout_width="10dp"
             android:layout_height="10dp"
             android:src="@drawable/play"
-            android:id="@+id/imvPlay"
+            android:id="@+id/imvPlayALbum"
             android:layout_alignParentLeft="true"
             android:layout_alignParentBottom="true"
             android:layout_margin="10dp" />
     </RelativeLayout>
-
-
 </androidx.constraintlayout.widget.ConstraintLayout>

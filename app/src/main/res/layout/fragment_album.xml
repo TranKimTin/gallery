@@ -5,27 +5,38 @@
     android:layout_height="match_parent"
     tools:context=".AlbumFragment">
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:layout_height="match_parent">
 
         <TextView
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_weight="14"
             android:gravity="center"
             android:text="Album"
-            android:textSize="30dp" />
+            android:textSize="30dp"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:padding="10dp"
+            android:id="@+id/tvTitleAlbum"/>
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rcvAlbum"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_weight="1"
             android:paddingTop="10dp"
             android:paddingLeft="10dp"
-            android:paddingRight="10dp"/>
-    </LinearLayout>
+            android:paddingRight="10dp"
+            android:layout_below="@+id/tvTitleAlbum"/>
+
+        <ImageView
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_alignParentRight="true"
+            android:padding="10dp"
+            android:src="@drawable/plus"
+            android:id="@+id/imvAddAlbum"
+            />
+    </RelativeLayout>
 </FrameLayout>
