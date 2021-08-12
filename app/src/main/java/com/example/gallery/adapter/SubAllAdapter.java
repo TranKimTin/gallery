@@ -8,8 +8,10 @@ import android.util.Size;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
 import android.widget.ImageView;
 
+import com.example.gallery.AllFragment;
 import com.example.gallery.MainActivity;
 import com.example.gallery.R;
 import com.example.gallery.modal.MyImage;
@@ -29,10 +31,13 @@ public class SubAllAdapter extends RecyclerView.Adapter<SubAllAdapter.SubAllView
     private List<MyImage> list;
     private Context context;
     private ThreadPoolExecutor executor;
+    private AllAdapter parent;
 
-    public SubAllAdapter(Context context, List<MyImage> list) {
+    public SubAllAdapter(Context context, List<MyImage> list, AllAdapter parent) {
         this.list = list;
         this.context = context;
+        this.parent = parent;
+
 
         int corePoolSize = 3;
         int maximumPoolSize = 10;
@@ -62,8 +67,15 @@ public class SubAllAdapter extends RecyclerView.Adapter<SubAllAdapter.SubAllView
     public void onBindViewHolder(@NonNull SubAllViewHolder holder, int position) {
         MyImage image = list.get(position);
         holder.imv.setImageResource(R.drawable.image_gallery);
-        if(image.getUrl() != null && image.getUrl().matches(".*mp4")) holder.imvPlay.setVisibility(View.VISIBLE);
+        Log.d(TAG, image.getName() + image.getName().matches(".*mp4"));
+        if (image.getName() != null && image.getName().matches(".*mp4"))
+            holder.imvPlay.setVisibility(View.VISIBLE);
         else holder.imvPlay.setVisibility(View.GONE);
+
+        if(onCheck) holder.cbxChecked.setVisibility(View.VISIBLE);
+        else holder.cbxChecked.setVisibility(View.GONE);
+
+        holder.cbxChecked.setChecked(image.isChecked());
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
             executor.execute(new Runnable() {
                 @Override
@@ -71,7 +83,7 @@ public class SubAllAdapter extends RecyclerView.Adapter<SubAllAdapter.SubAllView
                     try {
                         int size = list.size() < 50 ? 200 : 150;
                         Bitmap thumbnail = context.getContentResolver().loadThumbnail(image.getUri(), new Size(size, size), null);
-                        ((Activity)context).runOnUiThread(new Runnable() {
+                        ((Activity) context).runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
                                 holder.imv.setImageBitmap(thumbnail);
@@ -86,7 +98,26 @@ public class SubAllAdapter extends RecyclerView.Adapter<SubAllAdapter.SubAllView
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                open_file(context, image.getUri());
+                if (onCheck) {
+                    image.setChecked(!image.isChecked());
+                    notifyItemChanged(position);
+                } else {
+                    open_file(context, image.getUri());
+                }
+            }
+        });
+        holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                image.setChecked(!image.isChecked());
+                if(onCheck){
+                    notifyItemChanged(position);
+                }else{
+                    parent.notifyDataSetChanged();
+                    onCheck = true;
+                    AllFragment.getInstance().updateLayout();
+                }
+                return true;
             }
         });
     }
@@ -99,11 +130,13 @@ public class SubAllAdapter extends RecyclerView.Adapter<SubAllAdapter.SubAllView
     public class SubAllViewHolder extends RecyclerView.ViewHolder {
         ImageView imv;
         ImageView imvPlay;
+        CheckBox cbxChecked;
 
         public SubAllViewHolder(@NonNull View itemView) {
             super(itemView);
             imv = itemView.findViewById(R.id.imvAll);
             imvPlay = itemView.findViewById(R.id.imvPlay);
+            cbxChecked = itemView.findViewById(R.id.cbxCheckedSubAll);
         }
     }
 }

@@ -1,20 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="10dp"
-    android:orientation="vertical">
+    android:padding="10dp">
+
+    <CheckBox
+        android:id="@+id/cbxCheckedAll"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="-10dp"
+        android:button="@drawable/checkbox"
+        android:scaleX="0.5"
+        android:scaleY="0.5" />
+
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="23/08/2001"
         android:textSize="20dp"
         android:textStyle="bold"
-        android:id="@+id/tvDate"/>
+        android:id="@+id/tvDate"
+        android:layout_toRightOf="@+id/cbxCheckedAll"/>
     <androidx.recyclerview.widget.RecyclerView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/rcvSubAll"
-        android:nestedScrollingEnabled="false" />
-</LinearLayout>
+        android:nestedScrollingEnabled="false"
+        android:layout_below="@+id/tvDate"
+        android:layout_marginTop="3dp"/>
+</RelativeLayout>

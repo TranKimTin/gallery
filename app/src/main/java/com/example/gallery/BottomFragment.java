@@ -13,6 +13,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
+import static com.example.gallery.MainActivity.countPress;
+
 public class BottomFragment extends Fragment implements View.OnClickListener {
     private String TAG = "GALLERY_LOG";
     private Button btnAll, btnAlbum;
@@ -55,6 +57,7 @@ public class BottomFragment extends Fragment implements View.OnClickListener {
 
     @Override
     public void onClick(View v) {
+        countPress = 0;
         FragmentManager fragmentManager;
         switch (v.getId()) {
             case R.id.btnAll:

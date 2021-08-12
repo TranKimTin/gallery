@@ -16,8 +16,9 @@ public class MyImage {
     private String url;
     private String albumName;
     private long almumId;
+    boolean checked;
 
-    public MyImage(Uri uri, String name, long size, long date, String url, String albumName, long almumId) {
+    public MyImage(Uri uri, String name, long size, long date, String url, String albumName, long almumId, boolean checked) {
         this.uri = uri;
         this.name = name;
         this.size = size;
@@ -25,9 +26,18 @@ public class MyImage {
         this.url = url;
         this.albumName = albumName;
         this.almumId = almumId;
+        this.checked = checked;
     }
 
-    Bitmap toBitmap(Context context){
+    public boolean isChecked() {
+        return checked;
+    }
+
+    public void setChecked(boolean checked) {
+        this.checked = checked;
+    }
+
+    public Bitmap toBitmap(Context context){
         try {
             return MediaStore.Images.Media.getBitmap(context.getContentResolver() , uri);
         } catch (IOException e) {
@@ -35,7 +45,6 @@ public class MyImage {
             return null;
         }
     }
-
 
     public String getAlbumName() {
         return albumName;

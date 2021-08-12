@@ -3,6 +3,7 @@ package com.example.gallery;
 import android.app.AlertDialog;
 import android.content.ContentResolver;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -33,7 +34,7 @@ import java.util.List;
 import static com.example.gallery.MainActivity.TAG;
 import static com.example.gallery.MainActivity.hAlbum;
 
-public class AlbumFragment extends Fragment implements View.OnClickListener {
+public class AlbumFragment extends Fragment {
     private static AlbumFragment instance;
     private RecyclerView rcvAlbum;
     private List<Album> list;
@@ -63,52 +64,24 @@ public class AlbumFragment extends Fragment implements View.OnClickListener {
 
         rcvAlbum = view.findViewById(R.id.rcvAlbum);
         imvAdd = view.findViewById(R.id.imvAddAlbum);
+        imvAdd.setVisibility(View.GONE);
 
-        imvAdd.setOnClickListener(this);
         rcvAlbum.setLayoutManager(new GridLayoutManager(getContext(), 3));
         list = new ArrayList<>();
         for (String name : hAlbum.keySet()) {
             List<MyImage> l = hAlbum.get(name);
-            list.add(new Album(name, l.size(), l.size() > 0 ? l.get(0).getUri() : null));
+            list.add(new Album(name, l.size(), l.get(0).getUri(), l.get(0).getUrl()));
         }
         AlbumAdapter adapter = new AlbumAdapter(getContext(), list);
+        adapter.setmOnclickListener(new AlbumAdapter.OnclickListener() {
+            @Override
+            public void mOnclick(Album album) {
+                Intent intent = new Intent(getContext(), SubAlbumActivity.class);
+                intent.putExtra("album_name", album.getName());
+                getContext().startActivity(intent);
+            }
+        });
         rcvAlbum.setAdapter(adapter);
-
     }
 
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.imvAddAlbum:
-                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-                builder.setTitle("Tên album");
-// Set up the input
-                final EditText input = new EditText(getContext());
-// Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
-                input.setInputType(InputType.TYPE_CLASS_TEXT);
-                builder.setView(input);
-
-// Set up the buttons
-                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        String m_Text = input.getText().toString();
-                        addAdbum(m_Text);
-                    }
-                });
-                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.cancel();
-                    }
-                });
-
-                builder.show();
-                break;
-        }
-    }
-
-    private void addAdbum(String name) {
-
-    }
 }

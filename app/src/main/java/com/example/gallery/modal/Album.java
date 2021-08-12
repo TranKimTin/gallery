@@ -8,14 +8,24 @@ public class Album {
     private String name;
     private int count;
     private Uri uri;
+    private String url;
 
-    public Album(String name, int count, Uri uri) {
+    public Album(String name, int count, Uri uri, String url) {
         this.name = name;
         this.count = count;
         this.uri = uri;
+        this.url = url.substring(0, url.lastIndexOf('/'));
     }
 
     public Album() {
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        url = url;
     }
 
     public Uri getUri() {

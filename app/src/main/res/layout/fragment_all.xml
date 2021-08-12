@@ -5,28 +5,50 @@
     android:layout_height="match_parent"
     tools:context=".AllFragment">
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
-
+        android:layout_height="match_parent">
         <TextView
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_gravity="center"
-            android:layout_weight="14"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_alignParentTop="true"
             android:gravity="center"
             android:text="Hình ảnh"
-            android:textSize="30dp" />
-
+            android:textSize="30dp"
+            android:id="@+id/tvTitleAll"/>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:orientation="horizontal"
+            android:id="@+id/layoutAction"
+            android:visibility="gone"
+            android:layout_below="@+id/tvTitleAll">
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="Thêm vào album"
+                android:layout_weight="1"
+                android:layout_margin="1dp"
+                android:textColor="@color/black"
+                android:id="@+id/btnCopy" />
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="Di chuyển vào album"
+                android:textColor="@color/black"
+                android:layout_weight="1"
+                android:layout_margin="1dp"
+                android:id="@+id/btnMove" />
+        </LinearLayout>
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rcvAll"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_weight="1"
             android:paddingTop="10dp"
             android:paddingLeft="10dp"
-            android:paddingRight="10dp"/>
-    </LinearLayout>
+            android:paddingRight="10dp"
+            android:layout_below="@+id/layoutAction"/>
+    </RelativeLayout>
 
 </FrameLayout>

@@ -24,10 +24,15 @@ import androidx.recyclerview.widget.RecyclerView;
 public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.AlbumViewHolder> {
     private Context context;
     private List<Album> list;
+    private OnclickListener mOnclickListener;
 
     public AlbumAdapter(Context context, List<Album> list) {
         this.context = context;
         this.list = list;
+    }
+
+    public void setmOnclickListener(OnclickListener mOnclickListener) {
+        this.mOnclickListener = mOnclickListener;
     }
 
     @NonNull
@@ -68,9 +73,7 @@ public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.AlbumViewHol
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(context, SubAlbumActivity.class);
-                intent.putExtra("album_name", album.getName());
-                context.startActivity(intent);
+                mOnclickListener.mOnclick(album);
             }
         });
     }
@@ -91,5 +94,9 @@ public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.AlbumViewHol
             tvName = itemView.findViewById(R.id.tvNameAlbum);
             tvNumber = itemView.findViewById(R.id.tvNumber);
         }
+    }
+
+    public interface OnclickListener{
+        void mOnclick(Album album);
     }
 }

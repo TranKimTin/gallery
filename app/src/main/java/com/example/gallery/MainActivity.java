@@ -16,11 +16,18 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.provider.Settings;
 import android.util.Log;
+import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import com.example.gallery.modal.AllImage;
 import com.example.gallery.modal.MyImage;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -30,10 +37,16 @@ public class MainActivity extends AppCompatActivity {
     public static final String TAG = "GALLERY_LOG";
     public static TreeMap<String, List<MyImage>> hAlbum = new TreeMap<>();
     public static List<MyImage> listAll = new ArrayList<>();
+    public static boolean onCheck = false;
+    public static int countPress = 0;
+
+    private FrameLayout fragmentMain;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        countPress = 0;
+        fragmentMain = findViewById(R.id.fragmentMain);
         getSupportFragmentManager().beginTransaction()
                 .setReorderingAllowed(true)
                 .add(R.id.fragmentMain, AllFragment.getInstance(), null)
@@ -52,6 +65,8 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         }
+
+
     }
 
 
@@ -66,6 +81,15 @@ public class MainActivity extends AppCompatActivity {
         intent.setDataAndType(uri, mime);
         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
         context.startActivity(intent);
+    }
+
+    public static List<MyImage> getListSelected(){
+        List<MyImage> list = new ArrayList<>();
+        for(MyImage image : listAll){
+            if(image.isChecked())
+                list.add(image);
+        }
+        return list;
     }
 
     public static void getData(Context context) {
@@ -119,5 +143,47 @@ public class MainActivity extends AppCompatActivity {
 
             hAlbum.get(image.getAlbumName()).add(image);
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        countPress++;
+        if(onCheck){
+            onCheck = false;
+            countPress = 0;
+            AllFragment.getInstance().notifyDataSetChanged();
+
+        }else if(countPress == 1){
+            Toast.makeText(this, "Chạm lần nữa để thoát", Toast.LENGTH_SHORT).show();
+        }
+        else{
+            finish();
+        }
+    }
+
+    public static String copyFile(File src, File dest) throws IOException {
+        int i = 1;
+        String path = dest.getAbsolutePath();
+        int indexDot = path.indexOf('.');
+        while (dest.exists()) {
+            dest = new File(path.substring(0, indexDot) + "(" + i++ + ")" + path.substring(indexDot));
+        }
+        InputStream in = new FileInputStream(src);
+        try {
+            OutputStream out = new FileOutputStream(dest);
+            try {
+                // Transfer bytes from in to out
+                byte[] buf = new byte[1024];
+                int len;
+                while ((len = in.read(buf)) > 0) {
+                    out.write(buf, 0, len);
+                }
+            } finally {
+                out.close();
+            }
+        } finally {
+            in.close();
+        }
+        return path;
     }
 }

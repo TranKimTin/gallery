@@ -29,7 +29,6 @@ public class SubAlbumAdapter extends RecyclerView.Adapter<SubAlbumAdapter.SubAlb
     private List<MyImage> list;
     private Context context;
     private ThreadPoolExecutor executor;
-
     public SubAlbumAdapter(Context context, List<MyImage> list) {
         this.list = list;
         this.context = context;
