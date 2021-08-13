@@ -8,9 +8,13 @@ import android.util.Size;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
 import android.widget.ImageView;
 
+import com.example.gallery.AlbumFragment;
+import com.example.gallery.AllFragment;
 import com.example.gallery.R;
+import com.example.gallery.SubAlbumActivity;
 import com.example.gallery.modal.MyImage;
 
 import java.io.IOException;
@@ -23,12 +27,14 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import static com.example.gallery.MainActivity.TAG;
+import static com.example.gallery.MainActivity.onCheck;
 import static com.example.gallery.MainActivity.open_file;
 
 public class SubAlbumAdapter extends RecyclerView.Adapter<SubAlbumAdapter.SubAlbumViewHolder> {
     private List<MyImage> list;
     private Context context;
     private ThreadPoolExecutor executor;
+
     public SubAlbumAdapter(Context context, List<MyImage> list) {
         this.list = list;
         this.context = context;
@@ -43,9 +49,8 @@ public class SubAlbumAdapter extends RecyclerView.Adapter<SubAlbumAdapter.SubAlb
                 new ArrayBlockingQueue<>(queueCapacity)); // Blocking queue để cho request đợi
     }
 
-    void setData(List<MyImage> list) {
+    public void setList(List<MyImage> list) {
         this.list = list;
-        notifyDataSetChanged();
     }
 
     @NonNull
@@ -60,11 +65,16 @@ public class SubAlbumAdapter extends RecyclerView.Adapter<SubAlbumAdapter.SubAlb
     @Override
     public void onBindViewHolder(@NonNull SubAlbumViewHolder holder, int position) {
         MyImage image = list.get(position);
+        Log.d(TAG, image.getName());
         holder.imv.setImageResource(R.drawable.image_gallery);
         if (image.getUrl() != null && image.getUrl().matches(".*mp4"))
             holder.imvPlay.setVisibility(View.VISIBLE);
         else holder.imvPlay.setVisibility(View.GONE);
-        Log.d(TAG, image.getUrl() + " " + image.getUrl().matches(".*mp4"));
+
+        if (onCheck) holder.cbxChecked.setVisibility(View.VISIBLE);
+        else holder.cbxChecked.setVisibility(View.GONE);
+
+        holder.cbxChecked.setChecked(image.isChecked());
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
             executor.execute(new Runnable() {
                 @Override
@@ -87,7 +97,26 @@ public class SubAlbumAdapter extends RecyclerView.Adapter<SubAlbumAdapter.SubAlb
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                open_file(context, image.getUri());
+                if (onCheck) {
+                    image.setChecked(!image.isChecked());
+                    notifyItemChanged(position);
+                } else {
+                    open_file(context, image.getUri());
+                }
+            }
+        });
+        holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                image.setChecked(!image.isChecked());
+                if (onCheck) {
+                    notifyItemChanged(position);
+                } else {
+                    notifyDataSetChanged();
+                    onCheck = true;
+                    ((SubAlbumActivity)context).updateLayout();
+                }
+                return true;
             }
         });
     }
@@ -100,11 +129,18 @@ public class SubAlbumAdapter extends RecyclerView.Adapter<SubAlbumAdapter.SubAlb
     public class SubAlbumViewHolder extends RecyclerView.ViewHolder {
         ImageView imv;
         ImageView imvPlay;
+        CheckBox cbxChecked;
 
         public SubAlbumViewHolder(@NonNull View itemView) {
             super(itemView);
             imv = itemView.findViewById(R.id.imvSubAlbum);
             imvPlay = itemView.findViewById(R.id.imvPlayALbum);
+            cbxChecked = itemView.findViewById(R.id.cbxCheckedSubAlbum);
         }
+    }
+
+    public void fillChecked(boolean checked) {
+        for (int i = 0; i < list.size(); i++)
+            list.get(i).setChecked(checked);
     }
 }

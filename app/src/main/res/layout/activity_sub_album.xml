@@ -1,24 +1,59 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".SubAlbumActivity"
-    android:orientation="vertical"
-    android:padding="10dp">
+    android:paddingLeft="10dp"
+    android:paddingTop="10dp"
+    android:paddingRight="10dp">
     <TextView
         android:layout_width="wrap_content"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:layout_weight="14"
         android:gravity="center"
         android:text="Album"
         android:textSize="30dp"
-        android:id="@+id/tvNameSubAlbum" />
+        android:id="@+id/tvNameSubAlbum"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentTop="true"/>
     <androidx.recyclerview.widget.RecyclerView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:id="@+id/rcvSubAlbum" />
-</LinearLayout>
+        android:id="@+id/rcvSubAlbum"
+        android:layout_below="@+id/tvNameSubAlbum"
+        android:layout_above="@+id/layoutActionSubAlbum"/>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:orientation="horizontal"
+        android:id="@+id/layoutActionSubAlbum"
+        android:visibility="gone"
+        android:layout_alignParentBottom="true">
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="Thêm vào album"
+            android:layout_weight="1"
+            android:layout_margin="1dp"
+            android:textColor="@color/black"
+            android:id="@+id/btnCopySubAlbum" />
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="Di chuyển vào album"
+            android:textColor="@color/black"
+            android:layout_weight="1"
+            android:layout_margin="1dp"
+            android:id="@+id/btnMoveSubAlbum" />
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="Xóa"
+            android:textColor="@color/black"
+            android:layout_weight="1"
+            android:layout_margin="1dp"
+            android:id="@+id/btnRemoveSubAlbum" />
+    </LinearLayout>
+</RelativeLayout>

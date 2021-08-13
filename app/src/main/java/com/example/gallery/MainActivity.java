@@ -5,6 +5,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.FragmentManager;
 
 import android.Manifest;
+import android.app.AlertDialog;
 import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
@@ -16,6 +17,7 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.provider.Settings;
 import android.util.Log;
+import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 
@@ -32,6 +34,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.TreeMap;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends AppCompatActivity {
     public static final String TAG = "GALLERY_LOG";
@@ -39,12 +44,13 @@ public class MainActivity extends AppCompatActivity {
     public static List<MyImage> listAll = new ArrayList<>();
     public static boolean onCheck = false;
     public static int countPress = 0;
-
     private FrameLayout fragmentMain;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         countPress = 0;
         fragmentMain = findViewById(R.id.fragmentMain);
         getSupportFragmentManager().beginTransaction()
@@ -83,10 +89,10 @@ public class MainActivity extends AppCompatActivity {
         context.startActivity(intent);
     }
 
-    public static List<MyImage> getListSelected(){
+    public static List<MyImage> getListSelected() {
         List<MyImage> list = new ArrayList<>();
-        for(MyImage image : listAll){
-            if(image.isChecked())
+        for (MyImage image : listAll) {
+            if (image.isChecked())
                 list.add(image);
         }
         return list;
@@ -137,7 +143,7 @@ public class MainActivity extends AppCompatActivity {
             image.setAlmumId(cursor.getLong(column_album_id));
 
             listAll.add(image);
-            if (hAlbum.get(image.getAlbumName()) == null){
+            if (hAlbum.get(image.getAlbumName()) == null) {
                 hAlbum.put(image.getAlbumName(), new ArrayList<>());
             }
 
@@ -148,15 +154,14 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         countPress++;
-        if(onCheck){
+        if (onCheck) {
             onCheck = false;
             countPress = 0;
             AllFragment.getInstance().notifyDataSetChanged();
 
-        }else if(countPress == 1){
+        } else if (countPress == 1) {
             Toast.makeText(this, "Chạm lần nữa để thoát", Toast.LENGTH_SHORT).show();
-        }
-        else{
+        } else {
             finish();
         }
     }
@@ -186,4 +191,19 @@ public class MainActivity extends AppCompatActivity {
         }
         return path;
     }
+
+    public static void removeFile(Context context, MyImage image) {
+        try {
+            File file = new File(image.getUrl());
+            file.delete();
+            context.getContentResolver().delete(
+                    image.getName().matches(".*mp4")
+                            ? MediaStore.Video.Media.EXTERNAL_CONTENT_URI
+                            : MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                    MediaStore.MediaColumns.DATA + "='" + image.getUrl() + "'", null);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 }

@@ -84,4 +84,12 @@ public class AlbumFragment extends Fragment {
         rcvAlbum.setAdapter(adapter);
     }
 
+    public void notifyDataSetChanged() {
+        list.clear();
+        for (String name : hAlbum.keySet()) {
+            List<MyImage> l = hAlbum.get(name);
+            list.add(new Album(name, l.size(), l.get(0).getUri(), l.get(0).getUrl()));
+        }
+        rcvAlbum.getAdapter().notifyDataSetChanged();
+    }
 }

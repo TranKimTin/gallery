@@ -29,6 +29,7 @@
             android:button="@drawable/checkbox"
             android:layout_alignParentLeft="true"
             android:layout_alignParentTop="true"
+            android:visibility="gone"
             android:id="@+id/cbxCheckedSubAll"/>
     </RelativeLayout>
 

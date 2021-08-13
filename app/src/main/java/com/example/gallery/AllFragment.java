@@ -33,6 +33,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -50,9 +53,10 @@ public class AllFragment extends Fragment implements View.OnClickListener {
     private AllAdapter adapter;
     private TextView tvTitle;
     private LinearLayout layoutAction;
-    private Button btnCopy, btnMove;
+    private Button btnCopy, btnMove, btnRemove;
     private List<MyImage> listSelected;
     private AlertDialog dialog;
+    private ThreadPoolExecutor executor;
 
     public AllFragment() {
 
@@ -77,16 +81,21 @@ public class AllFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        initExecutor();
+
         tvTitle = view.findViewById(R.id.tvTitleAll);
         layoutAction = view.findViewById(R.id.layoutAction);
         btnCopy = view.findViewById(R.id.btnCopy);
         btnMove = view.findViewById(R.id.btnMove);
+        btnRemove = view.findViewById(R.id.btnRemove);
         rcvAll = view.findViewById(R.id.rcvAll);
         rcvAll.setNestedScrollingEnabled(false);
 //        rcvAll.setHasFixedSize(true);
 
         btnCopy.setOnClickListener(this);
         btnMove.setOnClickListener(this);
+        btnRemove.setOnClickListener(this);
 
         list = new ArrayList<>();
         adapter = new AllAdapter(getContext(), list);
@@ -96,10 +105,22 @@ public class AllFragment extends Fragment implements View.OnClickListener {
         refresh();
     }
 
+    private void initExecutor() {
+        int corePoolSize = 5;
+        int maximumPoolSize = 10;
+        int queueCapacity = 1000;
+
+        executor = new ThreadPoolExecutor(corePoolSize, // Số corePoolSize
+                maximumPoolSize, // số maximumPoolSize
+                500, // thời gian một thread được sống nếu không làm gì
+                TimeUnit.MILLISECONDS,
+                new ArrayBlockingQueue<>(queueCapacity)); // Blocking queue để cho request đợi
+    }
+
     private void refresh() {
         list.clear();
         getData(getContext());
-
+        onCheck = false;
         List<MyImage> item = new ArrayList<>();
         for (int i = 0; i < listAll.size(); i++) {
             if (i > 0 && listAll.get(i).getDate() != listAll.get(i - 1).getDate()) {
@@ -111,7 +132,7 @@ public class AllFragment extends Fragment implements View.OnClickListener {
         if (item.size() > 0)
             list.add(new AllImage(new Date(item.get(0).getDate() * 86400000), item));
         adapter = new AllAdapter(getContext(), list);
-        adapter.notifyDataSetChanged();
+        notifyDataSetChanged();
     }
 
     public void notifyDataSetChanged() {
@@ -149,6 +170,33 @@ public class AllFragment extends Fragment implements View.OnClickListener {
                 }
                 displayAlertDialog("move");
                 break;
+            case R.id.btnRemove:
+                listSelected = getListSelected();
+                if (listSelected.size() == 0) {
+                    Toast.makeText(getContext(), "Chưa chọn media nào", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                new AlertDialog.Builder(getContext())
+                        .setTitle("Xóa " + listSelected.size() + " media")
+                        .setMessage("Bạn có chắc chắn chưu?")
+                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                remove(listSelected);
+                                Toast.makeText(getContext(), "Xóa thành công", Toast.LENGTH_SHORT).show();
+                                onCheck = false;
+                                updateLayout();
+                                refresh();
+                            }
+                        })
+                        .setNegativeButton(android.R.string.no, null)
+                        .show();
+        }
+    }
+
+    private void remove(List<MyImage> listSelected) {
+        for (MyImage image : listSelected) {
+            removeFile(getContext(), image);
         }
     }
 
@@ -171,7 +219,7 @@ public class AllFragment extends Fragment implements View.OnClickListener {
                     public void onClick(DialogInterface dialog, int which) {
                         String m_Text = input.getText().toString();
                         String path = Environment.getExternalStorageDirectory().toString() + "/DCIM/" + m_Text;
-                        addAdbum(path, type);
+                        addAdbum(path, type, listSelected);
                     }
                 });
                 builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -184,6 +232,7 @@ public class AllFragment extends Fragment implements View.OnClickListener {
                 builder.show();
             }
         });
+
         rcvAlbum.setLayoutManager(new GridLayoutManager(getContext(), 3));
         List<Album> list = new ArrayList<>();
         for (String name : hAlbum.keySet()) {
@@ -194,7 +243,7 @@ public class AllFragment extends Fragment implements View.OnClickListener {
         adapter.setmOnclickListener(new AlbumAdapter.OnclickListener() {
             @Override
             public void mOnclick(Album album) {
-                addAdbum(album.getUrl(), type);
+                addAdbum(album.getUrl(), type, listSelected);
             }
         });
         rcvAlbum.setAdapter(adapter);
@@ -207,33 +256,47 @@ public class AllFragment extends Fragment implements View.OnClickListener {
         dialog.show();
     }
 
-    private void addAdbum(String url, String type) {
-        Toast.makeText(getContext(), url, Toast.LENGTH_SHORT).show();
+    private void addAdbum(String url, String type, List<MyImage> listSelected) {
+        initExecutor();
         for (MyImage image : listSelected) {
-            try {
-                File folderAlbum = new File(url);
-                if (!folderAlbum.exists()) folderAlbum.mkdir();
+            executor.execute(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        File folderAlbum = new File(url);
+                        if (!folderAlbum.exists()) folderAlbum.mkdir();
 
-                File src = new File(image.getUrl());
-                File dest = new File(url + "/" + image.getName());
+                        File src = new File(image.getUrl());
+                        File dest = new File(url + "/" + image.getName());
 
-                String path = copyFile(src, dest);
-                ContentValues contentValues = new ContentValues();
-                contentValues.put(MediaStore.Images.Media.DATA, path);
-                getContext().getContentResolver().insert(
-                        image.getName().matches(".*mp4")
-                                ? MediaStore.Video.Media.EXTERNAL_CONTENT_URI
-                                : MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                        contentValues
-                );
-                if (type.equals("move")) src.delete();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+                        String path = copyFile(src, dest);
+                        ContentValues contentValues = new ContentValues();
+                        contentValues.put(MediaStore.Images.Media.DATA, path);
+                        getContext().getContentResolver().insert(
+                                image.getName().matches(".*mp4")
+                                        ? MediaStore.Video.Media.EXTERNAL_CONTENT_URI
+                                        : MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                                contentValues
+                        );
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
         }
+        executor.shutdown();
+        await();
+        if (type.equals("move")) remove(listSelected);
         Toast.makeText(getContext(), "Success", Toast.LENGTH_SHORT).show();
         dialog.dismiss();
         refresh();
     }
 
+    private void await() {
+        try {
+            while (!executor.awaitTermination(50, TimeUnit.MILLISECONDS)) ;
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
 }

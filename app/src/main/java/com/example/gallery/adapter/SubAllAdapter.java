@@ -67,7 +67,6 @@ public class SubAllAdapter extends RecyclerView.Adapter<SubAllAdapter.SubAllView
     public void onBindViewHolder(@NonNull SubAllViewHolder holder, int position) {
         MyImage image = list.get(position);
         holder.imv.setImageResource(R.drawable.image_gallery);
-        Log.d(TAG, image.getName() + image.getName().matches(".*mp4"));
         if (image.getName() != null && image.getName().matches(".*mp4"))
             holder.imvPlay.setVisibility(View.VISIBLE);
         else holder.imvPlay.setVisibility(View.GONE);
